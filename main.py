@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from nltk.tokenize import word_tokenize
 import email
 
