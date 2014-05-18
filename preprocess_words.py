@@ -7,7 +7,7 @@ class PreprocessWords:
     def __init__(self):
         self.stemmer = SnowballStemmer("english")
 
-    def words_process(self, words):
+    def process_words(self, words):
         '''Returns a list of words that go through: tokenization,
         lowercase, keeping only letters and stemming.'''
         # Keep only alphabetic, remove punctuation, numbers, lowercase
