@@ -11,11 +11,17 @@ CLASSES = ['SPAM', 'HAM']
 TRAIN_CONFIG = [
     # (PATH, CLASS), 0 - SPAM, 1 - HAM
     ('spamassasin/train/spam', 0),
+    ('spamassasin/train/spam_2', 0),
     ('spamassasin/train/ham', 1),
+    ('spamassasin/train/ham_2', 1),
+    ('spamassasin/train/ham_hard', 1),
 ]
 TEST_CONFIG = [
     ('spamassasin/test/spam', 0),
+    ('spamassasin/test/spam_2', 0),
     ('spamassasin/test/ham', 1),
+    ('spamassasin/test/ham_2', 1),
+    ('spamassasin/test/ham_hard', 1),
 ]
 
 def do_with_config(config, classifier, preprocessor, train=True):
