@@ -12,8 +12,6 @@ TRAIN_CONFIG = [
     # (PATH, CLASS), 0 - SPAM, 1 - HAM
     ('spamassasin/train/spam', 0),
     ('spamassasin/train/ham', 1),
-    #('testing_email', 0),
-    #('testing_email2', 1),
 ]
 TEST_CONFIG = [
     ('spamassasin/test/spam', 0),
@@ -22,8 +20,16 @@ TEST_CONFIG = [
 
 def do_with_config(config, classifier, preprocessor, train=True):
     for path, cls in config:
+        classified_wrong = 0
+        total = 0
+
         # Get all files from local directory
         all_data_files = os.listdir(path)
+
+        string = 'training' if train else 'classifying'
+        print string + ' size ' + str(len(all_data_files)) + ' (' +\
+              CLASSES[cls] + ') ...',
+
         # For each training data from the provided path
         # get abs path and load data from file, parse it
         # and serve it to classifier.
@@ -45,10 +51,13 @@ def do_with_config(config, classifier, preprocessor, train=True):
                     classifier.train(words, cls)
                 else:
                     got_cls = classifier.classify(words)
-                    if got_cls == cls:
-                        print '.',
-                    else:
-                        print '\nClassified wrong (got,actual) : ', CLASSES[got_cls], CLASSES[cls], abs_path
+                    classified_wrong += got_cls != cls
+            total += 1
+
+        # Print info.
+        print 'Done.'
+        if not train:
+            print 'got wrong ' + str(classified_wrong)
 
 if __name__ == '__main__':
     # The classifier will learn once we feed it with data.
