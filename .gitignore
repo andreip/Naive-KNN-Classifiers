@@ -5,6 +5,7 @@ __pycache__/
 *.sw*
 out*
 .DS_Store
+*.bz2
 
 # C extensions
 *.so
