@@ -1,31 +1,16 @@
 #!/usr/bin/env python
 
 from nltk.tokenize import word_tokenize
-import email
-import os
+import os, sys
 
 from preprocess_words import PreprocessWords
 from classifier import Classifier
 
-CLASSES = ['SPAM', 'HAM']
-TRAIN_CONFIG = [
-    # (PATH, CLASS), 0 - SPAM, 1 - HAM
-    ('spamassasin/train/spam', 0),
-    ('spamassasin/train/spam_2', 0),
-    ('spamassasin/train/ham', 1),
-    ('spamassasin/train/ham_2', 1),
-    ('spamassasin/train/ham_hard', 1),
-]
-TEST_CONFIG = [
-    ('spamassasin/test/spam', 0),
-    ('spamassasin/test/spam_2', 0),
-    ('spamassasin/test/ham', 1),
-    ('spamassasin/test/ham_2', 1),
-    ('spamassasin/test/ham_hard', 1),
-]
+from constants import MAIL_CLASSES, MAIL_TRAIN_CONFIG, MAIL_TEST_CONFIG
+from parse.parse_mail import MailParse
 
 def do_with_config(config, classifier, preprocessor, train=True):
-    for path, cls in config:
+    for path in config:
         classified_wrong = 0
         total = 0
 
@@ -34,7 +19,8 @@ def do_with_config(config, classifier, preprocessor, train=True):
 
         string = 'training' if train else 'classifying'
         print string + ' size ' + str(len(all_data_files)) + ' (' +\
-              CLASSES[cls] + ') ...',
+              path + ') ...',
+        sys.stdout.flush()
 
         # For each training data from the provided path
         # get abs path and load data from file, parse it
@@ -42,17 +28,10 @@ def do_with_config(config, classifier, preprocessor, train=True):
         for data_file in all_data_files:
             abs_path = os.path.abspath(os.path.join(path, data_file))
 
-            with open(abs_path) as f:
-                # Get email's body only, remove header.
-                e = email.message_from_string(f.read())
-
-                body = e.get_payload()
-                if isinstance(body, list):
-                    body = ''.join(map(str, body))
-
-                body_words = word_tokenize(body)
-                #words = set(preprocessor.process_words(body_words))
-                words = preprocessor.process_words(body_words)
+            for text, cls in MailParse.get_parsed_texts(abs_path):
+                words = word_tokenize(text)
+                #words = set(preprocessor.process_words(words))
+                words = preprocessor.process_words(words)
                 if train:
                     classifier.train(words, cls)
                 else:
@@ -67,8 +46,8 @@ def do_with_config(config, classifier, preprocessor, train=True):
 
 if __name__ == '__main__':
     # The classifier will learn once we feed it with data.
-    classifier = Classifier(len(CLASSES))
+    classifier = Classifier(len(MAIL_CLASSES))
     preprocessor = PreprocessWords()
 
-    do_with_config(TRAIN_CONFIG, classifier, preprocessor, True)
-    do_with_config(TEST_CONFIG, classifier, preprocessor, False)
+    do_with_config(MAIL_TRAIN_CONFIG, classifier, preprocessor, True)
+    do_with_config(MAIL_TEST_CONFIG, classifier, preprocessor, False)
