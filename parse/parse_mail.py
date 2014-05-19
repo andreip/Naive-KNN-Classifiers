@@ -7,9 +7,9 @@ from parse import Parse
 class MailParse(Parse):
     @staticmethod
     def get_parsed_texts(path):
-        cls_name = basename(dirname(path)).lower()
+        dir_name = basename(dirname(path)).lower()
         # The index of the found class
-        cls = 0 if cls_name == MAIL_CLASSES[0].lower() else 1
+        cls = 0 if MAIL_CLASSES[0].lower() in dir_name else 1
 
         with open(path) as f:
             text = f.read()
