@@ -15,10 +15,11 @@ class PreprocessWords:
         words = map(self.keep_only_letters, words)
         words = map(lambda word: word.lower(), words)
         # Remove common words from english grammar.
-        words_no_common = filter(self.not_common_word, words)
+        words = filter(self.not_common_word, words)
+        # Keep only long enough words.
+        words = filter(self.not_too_short, words)
         # Stem all words from body.
-        words_stemmed = filter(self.stemmer.stem, words_no_common)
-        words = filter(self.not_too_short, words_stemmed)
+        words = filter(self.stemmer.stem, words)
         return words
 
     def keep_only_letters(self, word):
