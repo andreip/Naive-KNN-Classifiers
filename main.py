@@ -13,7 +13,6 @@ from parse.parse_rotten_tomatoes import RottenTomatoesParse
 def do_with_config(config, classifier, preprocessor, parser, train=True):
     for path in config:
         classified_wrong = 0
-        total = 0
 
         # Get all files from local directory
         all_data_files = os.listdir(path)
@@ -38,13 +37,12 @@ def do_with_config(config, classifier, preprocessor, parser, train=True):
                 else:
                     got_cls = classifier.classify(words)
                     # Count how many results we got the class wrong.
-                    if cls:
+                    if cls != None:
                         classified_wrong += got_cls != cls
                     # Print the result, we cannot account for the class
                     # right/wrong as we don't know it.
                     else:
                         print got_cls, words
-                total += 1
 
         # Print info.
         print 'Done.'

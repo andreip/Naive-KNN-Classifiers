@@ -1,7 +1,7 @@
 from collections import defaultdict
 import math
 
-class Classifier:
+class NaiveBayesClassifier:
     def __init__(self, nr_classes):
         # Classes 
         self.nr_classes = nr_classes
