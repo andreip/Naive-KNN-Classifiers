@@ -4,7 +4,8 @@ from nltk.tokenize import word_tokenize
 import os, sys
 
 from preprocess_words import PreprocessWords
-from classifier import Classifier
+from classifier.naive_bayes_classifier import NaiveBayesClassifier
+from classifier.knn_classifier import KNNClassifier
 
 from constants import *
 from parse.parse_mail import MailParse
@@ -49,23 +50,36 @@ def do_with_config(config, classifier, preprocessor, parser, train=True):
         if not train:
             print 'got wrong ' + str(classified_wrong)
 
+def do_exit():
+    print 'call like\n\t./main {TYPE=rotten/mail} {CLS=naive/knn} [K=integer (for KNN)]'
+    sys.exit(0)
+
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print 'call like\n\t./main {TYPE=rotten/mail}'
-        sys.exit(0)
+    if len(sys.argv) < 3:
+        do_exit()
 
     if sys.argv[1] == 'rotten':
-       cls, train, test = ROTTEN_CLASSES, ROTTEN_TRAIN_CONFIG, ROTTEN_TEST_CONFIG
-       parser = RottenTomatoesParse
+        cls, train, test = ROTTEN_CLASSES, ROTTEN_TRAIN_CONFIG, ROTTEN_TEST_CONFIG
+        parser = RottenTomatoesParse
     elif sys.argv[1] == 'mail':
-       cls, train, test = MAIL_CLASSES, MAIL_TRAIN_CONFIG, MAIL_TEST_CONFIG
-       parser = MailParse
+        cls, train, test = MAIL_CLASSES, MAIL_TRAIN_CONFIG, MAIL_TEST_CONFIG
+        parser = MailParse
     else:
-        print 'call like\n\t./main {TYPE=rotten/mail}'
-        sys.exit(0)
+        do_exit()
+
+    if sys.argv[2] == 'naive':
+        classifier = NaiveBayesClassifier(len(cls))
+    elif sys.argv[2] == 'knn':
+        # Read K from CLI if provided.
+        if len(sys.argv) > 3:
+            k = int(sys.argv[3])
+        else:
+            k = 5
+        classifier = KNNClassifier(k)
+    else:
+        do_exit()
 
     # The classifier will learn once we feed it with data.
-    classifier = Classifier(len(cls))
     preprocessor = PreprocessWords()
 
     do_with_config(train, classifier, preprocessor, parser, True)
