@@ -6,6 +6,7 @@ class PreprocessWords:
 
     def __init__(self):
         self.stemmer = SnowballStemmer("english")
+        self.stopwords = open(r'stopwords.txt', 'r').read().splitlines()
 
     def process_words(self, words):
         '''Returns a list of words that go through: tokenization,
@@ -20,6 +21,8 @@ class PreprocessWords:
         words = filter(self.not_too_short, words)
         # Stem all words from body.
         words = filter(self.stemmer.stem, words)
+        # Remove duplicates.
+        words = list(set(words))
         return words
 
     def keep_only_letters(self, word):
@@ -28,7 +31,7 @@ class PreprocessWords:
         return filter(letter, word)
 
     def not_common_word(self, word):
-        return word != self.COMMON_WORDS
+        return word not in self.stopwords
 
     def not_too_short(self, word):
         return len(word) > self.MIN_WORD_LEN
